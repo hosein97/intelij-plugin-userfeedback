@@ -27,8 +27,13 @@ public class DatabaseHelper {
         DB_URL = properties.getProperty("db.url");
     }
 
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, feedback TEXT NOT NULL)";
-    private static final String INSERT_FEEDBACK_SQL = "INSERT INTO feedback(feedback) VALUES(?)";
+    private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS feedback (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "feedback TEXT NOT NULL, " +
+            "animal_type TEXT NOT NULL, " +
+            "rating INTEGER NOT NULL)";
+
+    private static final String INSERT_FEEDBACK_SQL = "INSERT INTO feedback(feedback, animal_type, rating) VALUES(?, ?, ?)";
 
     public DatabaseHelper() {
         try {
@@ -54,10 +59,12 @@ public class DatabaseHelper {
         return conn;
     }
 
-    public void insertFeedback(String feedback) {
+    public void insertFeedback(String feedback, String animalType, int rating) {
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(INSERT_FEEDBACK_SQL)) {
             pstmt.setString(1, feedback);
+            pstmt.setString(2, animalType);
+            pstmt.setInt(3, rating);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error inserting feedback: " + e.getMessage());
