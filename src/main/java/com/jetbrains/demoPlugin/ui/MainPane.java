@@ -1,5 +1,7 @@
 package com.jetbrains.demoPlugin.ui;
 
+import com.jetbrains.demoPlugin.database.DatabaseHelper;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,22 +16,23 @@ public class MainPane extends JPanel {
     private JPanel feedbackPanel;
     private JProgressBar timeProgressBar;
     private Timer timer;
+    private DatabaseHelper dbHelper;
+    private JTextField feedbackField; // Move this to instance variable
 
     public MainPane() {
+        dbHelper = new DatabaseHelper();
+
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
-        // Initialize panels
         startPanel = createStartPanel();
         imagePanel = createImagePanel();
         feedbackPanel = createFeedbackPanel();
 
-        // Add panels to CardLayout
         add(startPanel, "StartPanel");
         add(imagePanel, "ImagePanel");
         add(feedbackPanel, "FeedbackPanel");
 
-        // Show the start panel initially
         cardLayout.show(this, "StartPanel");
     }
 
@@ -39,7 +42,6 @@ public class MainPane extends JPanel {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Show the image panel when the button is clicked
                 cardLayout.show(MainPane.this, "ImagePanel");
                 startTimer();
             }
@@ -51,14 +53,12 @@ public class MainPane extends JPanel {
     private JPanel createImagePanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Load and add the image
         JLabel imageLabel = new JLabel();
         ImageIcon imageIcon = new ImageIcon(getClass().getResource("/META-INF/hedgehog.jpg"));
         Image scaledImage = imageIcon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(scaledImage));
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        // Add time progress bar at the bottom
         timeProgressBar = new JProgressBar(0, 100);
         timeProgressBar.setStringPainted(true);
         panel.add(imageLabel, BorderLayout.CENTER);
@@ -71,7 +71,7 @@ public class MainPane extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
 
         JLabel feedbackLabel = new JLabel("Please provide your feedback:");
-        JTextField feedbackField = new JTextField(20); // Specify the preferred column width
+        feedbackField = new JTextField(20); // Specify the preferred column width
 
         JPanel feedbackInputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         feedbackInputPanel.add(feedbackField);
@@ -81,15 +81,14 @@ public class MainPane extends JPanel {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle feedback submission here (e.g., store feedback)
-                // Clear the feedback field
+                String feedback = feedbackField.getText();
+                System.out.println("feedback is : " + feedback);
+                dbHelper.insertFeedback(feedback);
                 feedbackField.setText("");
-                // After submission, return to the start panel
                 cardLayout.show(MainPane.this, "StartPanel");
             }
         });
 
-        // Add components to the feedback panel
         panel.add(feedbackLabel, BorderLayout.NORTH);
         panel.add(feedbackInputPanel, BorderLayout.CENTER);
         panel.add(submitButton, BorderLayout.SOUTH);
