@@ -18,16 +18,20 @@ public class DatabaseHelper {
                 System.out.println("Sorry, unable to find database.properties");
                 throw new RuntimeException("database.properties not found");
             }
-
             properties.load(input);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        DB_URL = properties.getProperty("db.url");
+        String dbUrl = System.getenv("DEMO_PLUGIN_DB_URL");
+        if (dbUrl == null || dbUrl.isEmpty()) {
+            dbUrl = properties.getProperty("db.url");
+        }
+        DB_URL = dbUrl;
+        System.out.println(DB_URL);
     }
 
-    private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, feedback TEXT NOT NULL, animal_type TEXT NOT NULL, rating INTEGER NOT NULL)";
+    private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, feedback TEXT NOT NULL, animal_type TEXT, rating INTEGER)";
     private static final String INSERT_FEEDBACK_SQL = "INSERT INTO feedback(feedback, animal_type, rating) VALUES(?, ?, ?)";
 
     public DatabaseHelper() {
@@ -49,7 +53,7 @@ public class DatabaseHelper {
         try {
             conn = DriverManager.getConnection(DB_URL);
         } catch (SQLException e) {
-            System.out.println("Connection failed: " + e.getMessage());
+            System.out.println("Error connecting to the database: " + e.getMessage());
         }
         return conn;
     }
@@ -66,4 +70,3 @@ public class DatabaseHelper {
         }
     }
 }
-
