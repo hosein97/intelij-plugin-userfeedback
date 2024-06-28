@@ -25,8 +25,6 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Sample Calendar" secondary="true"  anchor="right"
-                    factoryClass="com.jetbrains.demoPlugin.toolWindow.CalendarToolWindowFactory"/>
         <toolWindow id="Demo Plugin" anchor="right" factoryClass="com.jetbrains.demoPlugin.toolWindow.DemoToolWindowFactory"/>
     </extensions>
 
