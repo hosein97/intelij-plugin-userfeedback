@@ -1,4 +1,4 @@
-package com.jetbrains.demoPlugin.ui;
+package com.jetbrains.research.demoPlugin.ui;
 
 import javax.swing.*;
 import java.awt.*;

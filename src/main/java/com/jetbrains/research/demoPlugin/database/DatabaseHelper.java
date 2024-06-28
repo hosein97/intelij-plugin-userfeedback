@@ -1,4 +1,4 @@
-package com.jetbrains.demoPlugin.database;
+package com.jetbrains.research.demoPlugin.database;
 
 import java.io.IOException;
 import java.io.InputStream;
