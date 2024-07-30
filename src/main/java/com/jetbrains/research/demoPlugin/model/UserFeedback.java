@@ -7,7 +7,7 @@ public class UserFeedback {
     private final String feedback;
     private final String animalType;
     private final int rating;
-
+ 
     public UserFeedback(String feedback, String animalType, int rating) {
         this.feedback = feedback;
         this.animalType = animalType;
