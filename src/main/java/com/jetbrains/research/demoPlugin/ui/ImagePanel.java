@@ -63,8 +63,7 @@ public class ImagePanel extends JPanel {
                 if (timeElapsed >= 10000) {
                     timer.cancel();
 
-//                    ApplicationManager.getApplication().invokeLater();
-                    SwingUtilities.invokeLater(new Runnable() {
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             cardLayout.show(parentPanel, "FeedbackPanel");
