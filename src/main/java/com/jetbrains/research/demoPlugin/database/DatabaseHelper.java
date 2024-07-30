@@ -7,8 +7,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
+import com.intellij.openapi.diagnostic.Logger;
+import com.jetbrains.research.demoPlugin.model.UserFeedback;
 
+/**
+ * Handles database operations for the demo plugin.
+ */
 public class DatabaseHelper {
+    private static final Logger logger = Logger.getInstance(DatabaseHelper.class);
     private static final Properties properties = new Properties();
     private static final String DB_URL;
 
@@ -20,7 +26,7 @@ public class DatabaseHelper {
             }
             properties.load(input);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new RuntimeException("Failed to load database properties", ex);
         }
 
         String dbUrl = System.getenv("DEMO_PLUGIN_DB_URL");
@@ -28,7 +34,7 @@ public class DatabaseHelper {
             dbUrl = properties.getProperty("db.url");
         }
         DB_URL = dbUrl;
-        System.out.println(DB_URL);
+        logger.info("Database URL: " + DB_URL);
     }
 
     private static final String CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, feedback TEXT NOT NULL, animal_type TEXT, rating INTEGER)";
@@ -37,14 +43,15 @@ public class DatabaseHelper {
     public DatabaseHelper() {
         try {
             Class.forName("org.sqlite.JDBC"); // Ensure the SQLite JDBC driver is loaded
-            try (Connection conn = this.connect();
-                 PreparedStatement pstmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
-                pstmt.executeUpdate();
-            } catch (SQLException e) {
-                System.out.println("Error creating table: " + e.getMessage());
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("SQLite JDBC driver not found: " + e.getMessage());
+            createTableIfNotExists();
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.error("Failed to initialize DatabaseHelper", e);        }
+    }
+
+    private void createTableIfNotExists() throws SQLException {
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(CREATE_TABLE_SQL)) {
+            pstmt.executeUpdate();
         }
     }
 
@@ -58,15 +65,20 @@ public class DatabaseHelper {
         return conn;
     }
 
-    public void insertFeedback(String feedback, String animalType, int rating) {
+    /**
+     * Inserts feedback into the database.
+     * @param userFeedback The user feedback
+     *
+     */
+    public void insertFeedback(UserFeedback userFeedback) {
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(INSERT_FEEDBACK_SQL)) {
-            pstmt.setString(1, feedback);
-            pstmt.setString(2, animalType);
-            pstmt.setInt(3, rating);
+            pstmt.setString(1, userFeedback.getFeedback());
+            pstmt.setString(2, userFeedback.getAnimalType());
+            pstmt.setInt(3, userFeedback.getRating());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error inserting feedback: " + e.getMessage());
+            logger.error("Error inserting feedback", e);
         }
     }
 }

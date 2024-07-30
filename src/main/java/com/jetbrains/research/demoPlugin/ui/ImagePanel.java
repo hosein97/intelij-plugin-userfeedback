@@ -1,5 +1,8 @@
 package com.jetbrains.research.demoPlugin.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.Task;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Timer;
@@ -59,6 +62,8 @@ public class ImagePanel extends JPanel {
                 });
                 if (timeElapsed >= 10000) {
                     timer.cancel();
+
+//                    ApplicationManager.getApplication().invokeLater();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {

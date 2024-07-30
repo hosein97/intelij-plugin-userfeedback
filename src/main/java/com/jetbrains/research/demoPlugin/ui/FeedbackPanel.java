@@ -1,6 +1,10 @@
 package com.jetbrains.research.demoPlugin.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.ui.ComboBox;
 import com.jetbrains.research.demoPlugin.database.DatabaseHelper;
+import com.jetbrains.research.demoPlugin.model.UserFeedback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +34,7 @@ public class FeedbackPanel extends JPanel {
         feedbackField = new JTextField(20);
 
         JLabel typeLabel = new JLabel("Type of the animal in the image:");
-        typeComboBox = new JComboBox<>(new String[] {"None", "Cat", "Dog", "Hedgehog"});
+        typeComboBox = new ComboBox<>(new String[] {"None", "Cat", "Dog", "Hedgehog"});
 
         JLabel ratingLabel = new JLabel("Rate the image (1-5):");
         ratingSlider = new JSlider(1, 5, 3);
@@ -48,7 +52,6 @@ public class FeedbackPanel extends JPanel {
         feedbackInputPanel.add(ratingSlider);
 
         JButton submitButton = new JButton("Submit");
-
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -58,11 +61,23 @@ public class FeedbackPanel extends JPanel {
                 System.out.println("Feedback: " + feedback);
                 System.out.println("Animal Type: " + animalType);
                 System.out.println("Rating: " + rating);
-                dbHelper.insertFeedback(feedback, animalType, rating);
-                feedbackField.setText("");
-                typeComboBox.setSelectedIndex(0);
-                ratingSlider.setValue(3);
-                cardLayout.show(parentPanel, "StartPanel");
+                ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dbHelper.insertFeedback(new UserFeedback(feedback, animalType, rating));
+                        ApplicationManager.getApplication().invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                feedbackField.setText("");
+                                typeComboBox.setSelectedIndex(0);
+                                ratingSlider.setValue(3);
+                                cardLayout.show(parentPanel, "StartPanel");
+                            }
+                        });
+
+                    }
+                });
+
             }
         });
 

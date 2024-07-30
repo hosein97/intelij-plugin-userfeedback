@@ -39,6 +39,7 @@ public class StartPanel extends JPanel {
                 ((MainPane) parentPanel).getImagePanel().startTimer();
             }
         });
+
         add(startButton, new GridBagConstraints());
     }
 }
